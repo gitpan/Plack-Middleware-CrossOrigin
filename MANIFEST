@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Plack/Middleware/CrossOrigin.pm
+t/basic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

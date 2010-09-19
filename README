@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Plack-Middleware-CrossOrigin,
+version 0.001:
+
+  Adds headers to allow Cross-Origin Resource Sharing
+
+This software is copyright (c) 2010 by Graham Knop.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

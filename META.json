@@ -1,0 +1,51 @@
+{
+   "abstract" : "Adds headers to allow Cross-Origin Resource Sharing",
+   "author" : [
+      "Graham Knop <haarg@haarg.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-CrossOrigin",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack::Middleware" : 0,
+            "Plack::Util" : 0,
+            "Plack::Util::Accessor" : 0,
+            "parent" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Plack::Builder" : 0,
+            "Plack::Test" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/haarg/Plack-Middleware-CrossOrigin/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/haarg/Plack-Middleware-CrossOrigin.git",
+         "web" : "http://github.com/haarg/Plack-Middleware-CrossOrigin"
+      }
+   },
+   "version" : "0.001"
+}
+
