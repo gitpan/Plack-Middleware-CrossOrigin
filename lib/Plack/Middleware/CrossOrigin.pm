@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Plack::Middleware::CrossOrigin;
 BEGIN {
-  $Plack::Middleware::CrossOrigin::VERSION = '0.001';
+  $Plack::Middleware::CrossOrigin::VERSION = '0.002';
 }
 # ABSTRACT: Adds headers to allow Cross-Origin Resource Sharing
 use parent qw(Plack::Middleware);
@@ -49,7 +49,7 @@ sub cors_headers {
     my @allowed_methods = ref $self->methods ? @{ $self->methods } : $self->methods || ();
     my %allowed_methods = map { $_ => 1 } @allowed_methods;
     my @allowed_headers = ref $self->headers ? @{ $self->headers } : $self->headers || ();
-    my %allowed_headers = map { lc $_ => 1 } @allowed_methods;
+    my %allowed_headers = map { lc $_ => 1 } @allowed_headers;
 
     my $request_method = $env->{HTTP_ACCESS_CONTROL_REQUEST_METHOD};
     my $request_headers = $env->{HTTP_ACCESS_CONTROL_REQUEST_HEADERS};
@@ -131,7 +131,7 @@ Plack::Middleware::CrossOrigin - Adds headers to allow Cross-Origin Resource Sha
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
