@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Plack::Middleware::CrossOrigin;
 BEGIN {
-  $Plack::Middleware::CrossOrigin::VERSION = '0.002';
+  $Plack::Middleware::CrossOrigin::VERSION = '0.003';
 }
 # ABSTRACT: Adds headers to allow Cross-Origin Resource Sharing
 use parent qw(Plack::Middleware);
@@ -112,7 +112,7 @@ sub cors_headers {
     }
     if ($self->expose_headers) {
         my @expose_headers = ref $self->expose_headers ? @{ $self->expose_headers } : $self->expose_headers;
-        push @headers, 'Access-Control-Allow-Origin' => $_
+        push @headers, 'Access-Control-Expose-Headers' => $_
             for @expose_headers;
     }
     return @headers;
@@ -131,7 +131,7 @@ Plack::Middleware::CrossOrigin - Adds headers to allow Cross-Origin Resource Sha
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -158,12 +158,15 @@ Returns a list of headers to add for a CORS request given the request and the co
 
 =item origins
 
-A list of allowed origins.  '*' can be specified to allow access from
-any origin.
+A list of allowed origins.  '*' can be specified to allow access
+from any origin.
 
 =item headers
 
-A list of allowed headers.  '*' can be specified to allow any headers.
+A list of allowed headers.  '*' can be specified to allow any
+headers.  Many AJAX frameworks add the C<X-Requested-With> header to
+requests they make, so it is recommended that at least header be
+allowed.
 
 =item methods
 
