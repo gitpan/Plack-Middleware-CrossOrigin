@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: 6.31
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.200003, CPAN::Meta::Converter version 2.110330'
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,4 +23,4 @@ requires:
 resources:
   bugtracker: http://github.com/haarg/Plack-Middleware-CrossOrigin/issues
   repository: git://github.com/haarg/Plack-Middleware-CrossOrigin.git
-version: 0.004
+version: 0.005

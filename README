@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Plack-Middleware-CrossOrigin,
-version 0.004:
+version 0.005:
 
   Adds headers to allow Cross-Origin Resource Sharing
 
