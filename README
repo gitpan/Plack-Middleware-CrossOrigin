@@ -1,13 +1,30 @@
+NAME
+    Plack-Middleware-CrossOrigin - Adds headers to allow Cross-Origin Resource Sharing
 
+INSTALLATION
+    To install this distribution, run the following commands:
 
-This archive contains the distribution Plack-Middleware-CrossOrigin,
-version 0.005:
+        perl Makefile.PL
+        make
+        make test
+        make install
 
-  Adds headers to allow Cross-Origin Resource Sharing
+    Alternatively, have the CPAN client install it:
 
-This software is copyright (c) 2010 by Graham Knop.
+        cpan .
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+BUILDING FROM SOURCE
+    Dist::Zilla and several plugins are needed to build this
+    distribution.  After installing Dist::Zilla, you can see a list
+    of additional modules needed with the command:
 
+        dzil authordeps --missing
+
+    The module can be built with the command
+
+        dzil build
+
+    or installed with the command
+
+        dzil install
 

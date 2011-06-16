@@ -7,5 +7,6 @@ Makefile.PL
 README
 lib/Plack/Middleware/CrossOrigin.pm
 t/basic.t
+t/browser-test.psgi
 t/release-pod-coverage.t
 t/release-pod-syntax.t

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Plack::Middleware::CrossOrigin;
 BEGIN {
-  $Plack::Middleware::CrossOrigin::VERSION = '0.005';
+  $Plack::Middleware::CrossOrigin::VERSION = '0.006';
 }
 # ABSTRACT: Adds headers to allow Cross-Origin Resource Sharing
 use parent qw(Plack::Middleware);
@@ -95,8 +95,8 @@ sub _expose_headers {
 
 sub call {
     my ($self, $env) = @_;
-    if ($env->{HTTP_ORIGIN}) {
-        my @origins = split / /, $env->{HTTP_ORIGIN};
+    if (my $origin = $env->{HTTP_ORIGIN}) {
+        my @origins = split / /, $origin;
         my $request_method = $env->{HTTP_ACCESS_CONTROL_REQUEST_METHOD};
         my $request_headers = $env->{HTTP_ACCESS_CONTROL_REQUEST_HEADERS};
         my @request_headers = $request_headers ? (split /,\s*/, $request_headers) : ();
@@ -132,39 +132,30 @@ sub call {
             }
         }
         if ($self->credentials) {
-            push @headers, 'Access-Control-Allow-Origin' => $env->{HTTP_ORIGIN};
             push @headers, 'Access-Control-Allow-Credentials' => 'true';
         }
-        else {
-            if ($allowed_origins{'*'}) {
-                push @headers, 'Access-Control-Allow-Origin' => '*';
-            }
-            else {
-                push @headers, 'Access-Control-Allow-Origin' => $env->{HTTP_ORIGIN};
-            }
+        elsif ($allowed_origins{'*'}) {
+            $origin = '*';
         }
+        push @headers, 'Access-Control-Allow-Origin' => $origin;
+
         my $res;
         if ($preflight) {
+            if ($allowed_methods{'*'}) {
+                @allowed_methods = $request_method;
+            }
+            if ( $allowed_headers{'*'} ) {
+                @allowed_headers = @request_headers;
+            }
+
             if (defined $self->max_age) {
                 push @headers, 'Access-Control-Max-Age' => $self->max_age;
             }
+            push @headers, 'Access-Control-Allow-Methods' => $_
+                for @allowed_methods;
+            push @headers, 'Access-Control-Allow-Headers' => $_
+                for @allowed_headers;
 
-            if ($allowed_methods{'*'}) {
-                push @headers, 'Access-Control-Allow-Methods' => $request_method;
-            }
-            else {
-                push @headers, 'Access-Control-Allow-Methods' => $_
-                    for @allowed_methods;
-            }
-
-            if ( $allowed_headers{'*'} ) {
-                push @headers, 'Access-Control-Allow-Headers' => $_
-                    for @request_headers;
-            }
-            else {
-                push @headers, 'Access-Control-Allow-Headers' => $_
-                    for @allowed_headers;
-            }
             $res = [200, [ 'Content-Type' => 'text/plain' ], [] ];
         }
         else {
@@ -176,23 +167,25 @@ sub call {
 
             if ($expose_headers{'*'}) {
                 my %headers = @{ $res->[1] };
-                delete $headers{$_}
-                    for @simple_response_headers;
-                push @headers, 'Access-Control-Expose-Headers' => $_
-                    for keys %headers;
+                delete @headers{@simple_response_headers};
+                @expose_headers = keys %headers;
             }
-            else {
-                push @headers, 'Access-Control-Expose-Headers' => $_
-                    for @expose_headers;
-            }
+
+            push @headers, 'Access-Control-Expose-Headers' => $_
+                for @expose_headers;
 
             push @{$res->[1]}, @headers;
         });
     }
-    # for preflighted GET requests, WebKit doesn't include Origin
-    # with the actual request.  Has been fixed in trunk, but released
-    # versions of Safari and Chrome still have the issue.
-    elsif ($env->{REQUEST_METHOD} eq 'GET' && $env->{HTTP_USER_AGENT} && $env->{HTTP_USER_AGENT} =~ /AppleWebKit/) {
+    # for preflighted GET requests, some WebKit versions don't include Origin
+    # with the actual request.  Fixed in WebKit trunk and Chrome.  Current
+    # releases of Safari still suffer from the issue.
+    # https://bugs.webkit.org/show_bug.cgi?id=50773
+    # http://code.google.com/p/chromium/issues/detail?id=57836
+    elsif ($env->{REQUEST_METHOD} eq 'GET'
+        && $env->{HTTP_USER_AGENT}
+        && $env->{HTTP_USER_AGENT} =~ m{\bAppleWebKit/(\d+\.\d+)}
+        && $1 < 534.19) {
         my $origin_header;
         # transforming the referrer into the origin is the best we can do
         my ( $origin ) = ( $env->{HTTP_REFERER} =~ m{\A ( \w+://[^/]+ )}msx );
@@ -231,7 +224,7 @@ Plack::Middleware::CrossOrigin - Adds headers to allow Cross-Origin Resource Sha
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -251,7 +244,41 @@ version 0.005
 =head1 DESCRIPTION
 
 Adds Cross Origin Request Sharing headers used by modern browsers
-to allow XMLHttpRequests across domains.
+to allow C<XMLHttpRequest> to work across domains.  This module
+will also help protect against CSRF attacks in some browsers.
+
+This module attempts to fully conform to the CORS spec, while
+allowing additional flexibility in the values specified for the of
+the headers.
+
+=head1 CORS REQUESTS IN BRIEF
+
+There are two types of CORS requests.  Simple requests, and preflighted
+requests.
+
+=head2 Simple Requests
+
+A simple request is one that could be generated by a standard HTML
+form.  Either a C<GET> or C<POST> request, with no additional
+headers.  For these requests, the server processes the request as
+normal, and attaches the correct CORS headers in the response.  The
+browser then decides based on those headers whether to allow the
+client script access to the response.
+
+=head2 Preflighted Requests
+
+If additional headers are specified, or a method other than C<GET>
+or C<POST> is used, the request must be preflighted.  This means
+that the browser will first send a special request to the server
+to check if access is allowed.  If the server allows it by responding
+with the correct headers, the actual request is then performed.
+
+=head1 CSRF Protection
+
+Some browsers will also provide same headers with cross domain
+C<POST> requests from HTML forms.  These requests will also be
+checked against the allowed origins and rejected before they reach
+the rest of your Plack application.
 
 =head1 CONFIGURATION
 
@@ -259,14 +286,20 @@ to allow XMLHttpRequests across domains.
 
 =item origins
 
-A list of allowed origins.  Origins should be formatted as a URL scheme and
-host. (C<http://www.example.com>)  '*' can be specified to allow
-access from any location.  Must be specified for this middleware to have any effect.
+A list of allowed origins.  Origins should be formatted as a URL
+scheme and host, with no path information. (C<http://www.example.com>)
+'C<*>' can be specified to allow access from any location.  Must be
+specified for this middleware to have any effect.  This will be
+matched against the C<Origin> request header, and will control the
+C<Access-Control-Allow-Origin> response header.  If the origin does
+not match, the request is aborted.
 
 =item headers
 
-A list of allowed headers.  '*' can be specified to allow any
-headers.  Includes a set of headers by default to simplify working with WebDAV and AJAX frameworks:
+A list of allowed request headers.  'C<*>' can be specified to allow
+any headers.  Controls the C<Access-Control-Allow-Headers> response
+header.  Includes a set of headers by default to simplify working
+with WebDAV and AJAX frameworks:
 
 =over 4
 
@@ -306,26 +339,74 @@ C<X-Requested-With>
 
 =item methods
 
-A list of allowed methods.  '*' can be specified to allow any methods.
-Defaults to all of the standard HTTP and WebDAV methods.
+A list of allowed methods.  '*' can be specified to allow any
+methods.  Controls the C<Access-Control-Allow-Methods> response
+header.  Defaults to all of the standard HTTP and WebDAV methods.
 
 =item max_age
 
-The max length in seconds to cache the response data for.  If not
-specified, the web browser will decide how long to use.
+The max length in seconds to cache the response data for.  Controls
+the C<Access-Control-Max-Age> response header.  If not specified,
+the web browser will decide how long to use.
 
 =item expose_headers
 
 A list of allowed headers to expose to the client. '*' can be
 specified to allow the browser to see all of the response headers.
+Controls the C<Access-Control-Expose-Headers> response header.
 
 =item credentials
 
-Whether the resource will be allowed with user credentials supplied.
+Whether the resource will be allowed with user credentials (cookies,
+HTTP authentication, and client-side SSL certificates) supplied.
+Controls the C<Access-Control-Allow-Credentials> response header.
+
+=back
+
+=head1 BROWSER SUPPORT
+
+Different browsers have different levels of support for CORS headers.
+
+=over 8
+
+=item Gecko (Firefox, Seamonkey)
+
+Initially supported in Gecko 1.9.1 (Firefox 3.5).  Supports the
+complete CORS spec for C<XMLHttpRequest>s.
+
+Does not yet provide the C<Origin> header for CSRF protection
+(L<Bugzilla #446344|https://bugzilla.mozilla.org/show_bug.cgi?id=446344>).
+
+=item WebKit (Safari, Google Chrome)
+
+Initially supported in Safari 4 and Chrome 3.  The C<expose_headers>
+feature is currently unsupported (L<WebKit bug #41210|https://bugs.webkit.org/show_bug.cgi?id=41210>).
+The current release of Safari has a bug in its handling of preflighted
+C<GET> requests (L<WebKit bug #50773|https://bugs.webkit.org/show_bug.cgi?id=50773>)
+which has been fixed in WebKit v534.19 and Chrome 11.  This module uses the
+C<Referer> header to work around the issue when possible.
+
+Also provides the C<Origin> header for CSRF protection starting
+with WebKit v528.5 (Chrome 2, Safari 4).
+
+=item Internet Explorer
+
+Initially supported in IE8.  Not supported with the standard
+C<XMLHttpRequest> object.  A separate object, C<XDomainRequest>,
+must be used.  Only C<GET> and C<POST> methods are allowed.  No
+extra headers can be added to the request.  Neither the status code
+or any headers aside from C<Content-Type> can be retrieved from the
+response.
+
+=item Opera
+
+Not supported in any version of Opera.
 
 =back
 
 =head1 SEE ALSO
+
+=head2 CORS Resources
 
 =over 4
 
@@ -345,6 +426,43 @@ L<Mozilla Developer Center - Server-Side Access Control|https://developer.mozill
 
 L<Cross browser examples of using CORS requests|http://www.nczonline.net/blog/2010/05/25/cross-domain-ajax-with-cross-origin-resource-sharing/>
 
+=item *
+
+L<MSDN - XDomainRequest Object|http://msdn.microsoft.com/en-us/library/cc288060%28v=vs.85%29.aspx>
+
+=item *
+
+L<XDomainRequest - Restrictions, Limitations and Workarounds|http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx>
+
+=item *
+
+L<Wikipedia - Cross-Origin Resource Sharing|http://en.wikipedia.org/wiki/Cross-Origin_Resource_Sharing>
+
+=item *
+
+L<CORS advocacy|http://enable-cors.org/>
+
+=back
+
+=head2 CSRF Resources
+
+* L<Wikipedia - Cross-site request forgery|http://en.wikipedia.org/wiki/Cross-site_request_forgery>
+* L<Stanford Web Security Research - Cross-Site Request Forgery|http://seclab.stanford.edu/websec/csrf/>
+* L<WebKit Bugzilla - Add origin header to POST requests|https://bugs.webkit.org/show_bug.cgi?id=20792>
+* L<Mozilla Bugzilla - Implement Origin header CSRF mitigation |https://bugzilla.mozilla.org/show_bug.cgi?id=446344>
+
+=head2 Related Technologies
+
+=over 4
+
+=item *
+
+L<Cross-domain policy file for Flash|http://www.adobe.com/devnet/articles/crossdomain_policy_file_spec.html>
+
+=item *
+
+L<Wikipedia - JSONP|http://en.wikipedia.org/wiki/JSONP>
+
 =back
 
 =head1 AUTHOR
@@ -353,7 +471,7 @@ Graham Knop <haarg@haarg.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2010 by Graham Knop.
+This software is copyright (c) 2011 by Graham Knop.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
