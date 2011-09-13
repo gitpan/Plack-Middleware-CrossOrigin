@@ -4,7 +4,7 @@
       "Graham Knop <haarg@haarg.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110930",
+   "generated_by" : "Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.112150",
    "license" : [
       "perl_5"
    ],
@@ -24,14 +24,16 @@
             "Plack::Middleware" : 0,
             "Plack::Util" : 0,
             "Plack::Util::Accessor" : 0,
-            "parent" : 0
+            "parent" : 0,
+            "strict" : 0,
+            "warnings" : 0
          }
       },
       "test" : {
          "requires" : {
             "Plack::Builder" : 0,
             "Plack::Test" : 0,
-            "Test::More" : 0
+            "Test::More" : "0.88"
          }
       }
    },
@@ -46,6 +48,6 @@
          "web" : "http://github.com/haarg/Plack-Middleware-CrossOrigin"
       }
    },
-   "version" : "0.006"
+   "version" : "0.007"
 }
 

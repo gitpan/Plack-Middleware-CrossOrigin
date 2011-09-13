@@ -9,29 +9,31 @@ use ExtUtils::MakeMaker 6.30;
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'Adds headers to allow Cross-Origin Resource Sharing',
-  'AUTHOR' => 'Graham Knop <haarg@haarg.org>',
-  'BUILD_REQUIRES' => {
-    'Plack::Builder' => '0',
-    'Plack::Test' => '0',
-    'Test::More' => '0'
+  "ABSTRACT" => "Adds headers to allow Cross-Origin Resource Sharing",
+  "AUTHOR" => "Graham Knop <haarg\@haarg.org>",
+  "BUILD_REQUIRES" => {
+    "Plack::Builder" => 0,
+    "Plack::Test" => 0,
+    "Test::More" => "0.88"
   },
-  'CONFIGURE_REQUIRES' => {
-    'ExtUtils::MakeMaker' => '6.30'
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30"
   },
-  'DISTNAME' => 'Plack-Middleware-CrossOrigin',
-  'EXE_FILES' => [],
-  'LICENSE' => 'perl',
-  'NAME' => 'Plack::Middleware::CrossOrigin',
-  'PREREQ_PM' => {
-    'Plack::Middleware' => '0',
-    'Plack::Util' => '0',
-    'Plack::Util::Accessor' => '0',
-    'parent' => '0'
+  "DISTNAME" => "Plack-Middleware-CrossOrigin",
+  "EXE_FILES" => [],
+  "LICENSE" => "perl",
+  "NAME" => "Plack::Middleware::CrossOrigin",
+  "PREREQ_PM" => {
+    "Plack::Middleware" => 0,
+    "Plack::Util" => 0,
+    "Plack::Util::Accessor" => 0,
+    "parent" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
-  'VERSION' => '0.006',
-  'test' => {
-    'TESTS' => 't/*.t'
+  "VERSION" => "0.007",
+  "test" => {
+    "TESTS" => "t/*.t"
   }
 );
 
