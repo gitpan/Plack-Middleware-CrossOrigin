@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Plack::Middleware::CrossOrigin;
 {
-  $Plack::Middleware::CrossOrigin::VERSION = '0.007';
+  $Plack::Middleware::CrossOrigin::VERSION = '0.008';
 }
 # ABSTRACT: Adds headers to allow Cross-Origin Resource Sharing
 use parent qw(Plack::Middleware);
@@ -22,7 +22,6 @@ my @simple_headers = qw(
     Accept
     Accept-Language
     Content-Language
-    Last-Event-ID
 );
 my @simple_response_headers = qw(
     Cache-Control
@@ -97,9 +96,9 @@ sub call {
         $continue_on_failure = $self->continue_on_failure;
     }
     # for preflighted GET requests, some WebKit versions don't
-    # include Origin with the actual request.  Fixed in WebKit trunk
-    # and Chrome.  Current releases of Safari still suffer from the
-    # issue.  Work around it using the Referer header.
+    # include Origin with the actual request.  Fixed in current versions
+    # of WebKit, Chrome, and Safari.
+    # Work around it using the Referer header.
     # https://bugs.webkit.org/show_bug.cgi?id=50773
     # http://code.google.com/p/chromium/issues/detail?id=57836
     elsif ($env->{REQUEST_METHOD} eq 'GET'
@@ -204,9 +203,8 @@ sub _response_success {
 
 1;
 
-
-
 __END__
+
 =pod
 
 =head1 NAME
@@ -215,7 +213,7 @@ Plack::Middleware::CrossOrigin - Adds headers to allow Cross-Origin Resource Sha
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -354,9 +352,15 @@ Controls the C<Access-Control-Allow-Credentials> response header.
 
 =item continue_on_failure
 
-Normally, simple requests with an Origin that hasn't been allowed will be stopped before they continue to the main app.  If this option is set, the request will be allowed to continue, but no CORS headers will be added to the response.  This matches how non-allowed requests would be handled if this module was not used at all.
+Normally, simple requests with an Origin that hasn't been allowed
+will be stopped before they continue to the main app.  If this
+option is set, the request will be allowed to continue, but no CORS
+headers will be added to the response.  This matches how non-allowed
+requests would be handled if this module was not used at all.
 
-This disabled the CSRF protection and is not recommended.  It could be needed for applications that need to allow cross-origin HTML form C<POST>s without whitelisting domains.
+This disables the CSRF protection and is not recommended.  It could
+be needed for applications that need to allow cross-origin HTML
+form C<POST>s without whitelisting domains.
 
 =back
 
@@ -376,12 +380,13 @@ Does not yet provide the C<Origin> header for CSRF protection
 
 =item WebKit (Safari, Google Chrome)
 
-Initially supported in Safari 4 and Chrome 3.  The C<expose_headers>
-feature is currently unsupported (L<WebKit bug #41210|https://bugs.webkit.org/show_bug.cgi?id=41210>).
-The current release of Safari has a bug in its handling of preflighted
-C<GET> requests (L<WebKit bug #50773|https://bugs.webkit.org/show_bug.cgi?id=50773>)
-which has been fixed in WebKit v534.19 and Chrome 11.  This module uses the
-C<Referer> header to work around the issue when possible.
+Initially supported in Safari 4 and Chrome 3. Supports the complete
+CORS spec.
+
+The C<expose_headers> feature has been supported since WebKit v535.18
+(Safari 6, Chrome 18). Preflighted requests were buggy prior to
+WebKit v534.19 (Safari 5.1, Chrome 11), but this module uses a
+workaround where possible (using the C<Referer> header).
 
 Also provides the C<Origin> header for CSRF protection starting
 with WebKit v528.5 (Chrome 2, Safari 4).
@@ -395,9 +400,11 @@ extra headers can be added to the request.  Neither the status code
 or any headers aside from C<Content-Type> can be retrieved from the
 response.
 
+IE10 supports CORS via the standard C<XMLHttpRequest> object.
+
 =item Opera
 
-Not supported in any version of Opera.
+Opera and Opera Mobile support CORS since version 12.
 
 =back
 
@@ -489,4 +496,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

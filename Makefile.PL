@@ -12,8 +12,11 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Adds headers to allow Cross-Origin Resource Sharing",
   "AUTHOR" => "Graham Knop <haarg\@haarg.org>",
   "BUILD_REQUIRES" => {
+    "Plack::App::File" => 0,
     "Plack::Builder" => 0,
+    "Plack::Request" => 0,
     "Plack::Test" => 0,
+    "Socket" => 0,
     "Test::More" => "0.88"
   },
   "CONFIGURE_REQUIRES" => {
@@ -31,7 +34,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
