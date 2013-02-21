@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Plack::Middleware::CrossOrigin;
 {
-  $Plack::Middleware::CrossOrigin::VERSION = '0.008';
+  $Plack::Middleware::CrossOrigin::VERSION = '0.009';
 }
 # ABSTRACT: Adds headers to allow Cross-Origin Resource Sharing
 use parent qw(Plack::Middleware);
@@ -105,6 +105,7 @@ sub call {
         && $env->{HTTP_USER_AGENT}
         && $env->{HTTP_USER_AGENT} =~ m{\bAppleWebKit/(\d+\.\d+)}
         && $1 < 534.19
+        && $env->{HTTP_REFERER}
         && $env->{HTTP_REFERER} =~ m{\A ( \w+://[^/]+ )}msx
     ) {
         $origin = $1;
@@ -213,7 +214,7 @@ Plack::Middleware::CrossOrigin - Adds headers to allow Cross-Origin Resource Sha
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

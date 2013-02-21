@@ -4,7 +4,7 @@
       "Graham Knop <haarg@haarg.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "perl_5"
    ],
@@ -58,6 +58,6 @@
          "web" : "http://github.com/haarg/Plack-Middleware-CrossOrigin"
       }
    },
-   "version" : "0.008"
+   "version" : "0.009"
 }
 
