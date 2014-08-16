@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-CrossOrigin
 
+0.010     Aug 15 2014
+ - updated to match spec, with only one origin
+ - specify minimum perl version
+
 0.009     Feb 20 2013
  - Suppress warnings when checking for buggy WebKit browsers. (Dave Rolsky)
 

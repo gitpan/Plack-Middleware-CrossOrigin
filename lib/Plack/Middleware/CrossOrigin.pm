@@ -1,10 +1,9 @@
 use strict;
 use warnings;
 package Plack::Middleware::CrossOrigin;
-{
-  $Plack::Middleware::CrossOrigin::VERSION = '0.009';
-}
+$Plack::Middleware::CrossOrigin::VERSION = '0.010';
 # ABSTRACT: Adds headers to allow Cross-Origin Resource Sharing
+use 5.008;
 use parent qw(Plack::Middleware);
 
 use Plack::Util;
@@ -115,7 +114,6 @@ sub call {
         return $self->app->($env);
     }
 
-    my @origins = split / /, $origin;
     my $request_method  = $env->{HTTP_ACCESS_CONTROL_REQUEST_METHOD};
     my $request_headers = $env->{HTTP_ACCESS_CONTROL_REQUEST_HEADERS};
     my @request_headers = $request_headers ? (split /,\s*/, $request_headers) : ();
@@ -136,7 +134,7 @@ sub call {
     if ($allowed_origins_h->{'*'} ) {
         # allow request to proceed
     }
-    elsif ( grep { ! defined } @{$allowed_origins_h}{@origins} ) {
+    elsif ( ! $allowed_origins_h->{$origin} ) {
         return $fail->($env);
     }
 
@@ -208,13 +206,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Plack::Middleware::CrossOrigin - Adds headers to allow Cross-Origin Resource Sharing
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

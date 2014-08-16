@@ -4,7 +4,7 @@
       "Graham Knop <haarg@haarg.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141520",
    "license" : [
       "perl_5"
    ],
@@ -16,7 +16,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
@@ -32,6 +32,7 @@
             "Plack::Util" : "0",
             "Plack::Util::Accessor" : "0",
             "parent" : "0",
+            "perl" : "5.008",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -58,6 +59,6 @@
          "web" : "http://github.com/haarg/Plack-Middleware-CrossOrigin"
       }
    },
-   "version" : "0.009"
+   "version" : "0.010"
 }
 
