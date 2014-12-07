@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Plack::Middleware::CrossOrigin;
-$Plack::Middleware::CrossOrigin::VERSION = '0.011';
+$Plack::Middleware::CrossOrigin::VERSION = '0.012';
 # ABSTRACT: Adds headers to allow Cross-Origin Resource Sharing
 use 5.008;
 use parent qw(Plack::Middleware);
@@ -211,7 +211,7 @@ Plack::Middleware::CrossOrigin - Adds headers to allow Cross-Origin Resource Sha
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

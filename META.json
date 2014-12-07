@@ -59,6 +59,6 @@
          "web" : "http://github.com/haarg/Plack-Middleware-CrossOrigin"
       }
    },
-   "version" : "0.011"
+   "version" : "0.012"
 }
 
