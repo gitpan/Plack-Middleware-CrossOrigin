@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Plack::Middleware::CrossOrigin;
-$Plack::Middleware::CrossOrigin::VERSION = '0.010';
+$Plack::Middleware::CrossOrigin::VERSION = '0.011';
 # ABSTRACT: Adds headers to allow Cross-Origin Resource Sharing
 use 5.008;
 use parent qw(Plack::Middleware);
@@ -165,10 +165,8 @@ sub call {
         if (defined $self->max_age) {
             push @headers, 'Access-Control-Max-Age' => $self->max_age;
         }
-        push @headers, 'Access-Control-Allow-Methods' => $_
-            for @$allowed_methods;
-        push @headers, 'Access-Control-Allow-Headers' => $_
-            for @$allowed_headers;
+        push @headers, 'Access-Control-Allow-Methods' => join ', ', @$allowed_methods;
+        push @headers, 'Access-Control-Allow-Headers' => join ', ', @$allowed_headers;
 
         $res = _response_success();
     }
@@ -185,8 +183,7 @@ sub call {
             $expose_headers = [keys %headers];
         }
 
-        push @headers, 'Access-Control-Expose-Headers' => $_
-            for @$expose_headers;
+        push @headers, 'Access-Control-Expose-Headers' => join ', ', @$expose_headers;
 
         push @{ $res->[1] }, @headers;
     });
@@ -214,7 +211,7 @@ Plack::Middleware::CrossOrigin - Adds headers to allow Cross-Origin Resource Sha
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

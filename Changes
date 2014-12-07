@@ -1,5 +1,7 @@
 Revision history for Plack-Middleware-CrossOrigin
 
+0.011     Dec 07 2014
+
 0.010     Aug 15 2014
  - updated to match spec, with only one origin
  - specify minimum perl version
